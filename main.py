@@ -5,12 +5,14 @@ from aliens import Alien
 from ammomanager import AmmoManager
 import time
 import pygame
+import os
 
 # Initialize Pygame mixer
 pygame.mixer.init()
-# Load the swoosh sound effect
-swoosh_sound = pygame.mixer.Sound("swoosh.wav")
-# Play the swoosh sound effect
+# Get the directory of the script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sound_path = os.path.join(BASE_DIR, "sounds/swoosh.wav")
+swoosh_sound = pygame.mixer.Sound(sound_path)
 swoosh_sound.play()
 
 screen = Screen()
