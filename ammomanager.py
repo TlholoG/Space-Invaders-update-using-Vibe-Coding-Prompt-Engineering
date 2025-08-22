@@ -1,5 +1,16 @@
 from ammunition import Ammunition
+import pygame
+import os
 
+# Initialize mixer if not already
+pygame.mixer.init()
+
+# Get path relative to this file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sound_path = os.path.join(BASE_DIR, "sounds/swoosh.ogg")  # or swoosh.ogg
+
+# Load swoosh sound once
+swoosh_sound = pygame.mixer.Sound(sound_path)
 
 class AmmoManager:
     def __init__(self, scoreboard):
@@ -22,6 +33,7 @@ class AmmoManager:
         for bullet in self.bullets[:]:
             for alien in aliens[:]:
                 if bullet.distance(alien) < 45:
+                    swoosh_sound.play()
                     bullet.hideturtle()
                     alien.hideturtle()
                     self.bullets.remove(bullet)

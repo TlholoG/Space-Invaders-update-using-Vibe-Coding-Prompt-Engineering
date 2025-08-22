@@ -4,16 +4,6 @@ from scoreboard import ScoreBoard
 from aliens import Alien
 from ammomanager import AmmoManager
 import time
-import pygame
-import os
-
-# Initialize Pygame mixer
-pygame.mixer.init()
-# Get the directory of the script
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sound_path = os.path.join(BASE_DIR, "sounds/swoosh.ogg")
-swoosh_sound = pygame.mixer.Sound(sound_path)
-swoosh_sound.play()
 
 screen = Screen()
 screen.setup(width=600, height=600)
