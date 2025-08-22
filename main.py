@@ -11,7 +11,7 @@ import os
 pygame.mixer.init()
 # Get the directory of the script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sound_path = os.path.join(BASE_DIR, "sounds/swoosh.wav")
+sound_path = os.path.join(BASE_DIR, "sounds/swoosh.ogg")
 swoosh_sound = pygame.mixer.Sound(sound_path)
 swoosh_sound.play()
 
