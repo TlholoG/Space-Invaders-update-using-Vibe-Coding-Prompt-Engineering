@@ -1,0 +1,11 @@
+Prompt 1
+Improve this code to include sound, everytime the bullet hits an alien I want a swooshing sound effect. https://github.com/TlholoG/Space-Invaders-update-using-Vibe-Coding-Prompt-Engineering
+
+Prompt 2
+line 15, in <module>
+    swoosh_sound = pygame.mixer.Sound(sound_path)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pygame.error: Unrecognized audio format
+
+Prompt 3
+The swoosh sound plays once at the beginning of the game. Which part of this code should I slot it in so everytime it hits an alien it plays the sound. I think in the ammomanager.py file I must make changes
