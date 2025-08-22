@@ -4,6 +4,14 @@ from scoreboard import ScoreBoard
 from aliens import Alien
 from ammomanager import AmmoManager
 import time
+import pygame
+
+# Initialize Pygame mixer
+pygame.mixer.init()
+# Load the swoosh sound effect
+swoosh_sound = pygame.mixer.Sound("swoosh.wav")
+# Play the swoosh sound effect
+swoosh_sound.play()
 
 screen = Screen()
 screen.setup(width=600, height=600)
