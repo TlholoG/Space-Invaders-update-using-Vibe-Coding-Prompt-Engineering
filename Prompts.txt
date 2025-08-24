@@ -9,3 +9,330 @@ pygame.error: Unrecognized audio format
 
 Prompt 3
 The swoosh sound plays once at the beginning of the game. Which part of this code should I slot it in so everytime it hits an alien it plays the sound. I think in the ammomanager.py file I must make changes
+
+Prompt 4
+I want Alien1 to be able to fire bullets. The spaceship must have a health gauge 0-100% .
+Every time the spaceship makes contact with a bullet from the alien the health of the spaceship is reduced by 10%.
+If the health of the spaceship == 0 then game over
+
+Prompt 5
+Yes please integrate all of this directly into the repository structure
+
+Prompt 6
+please check the repository correctly. There is an "Aliens.py" file that is initialized as a turtle, in your current solution you are suggesting a new class called "Alien.py" that is initialized as "pygame.sprite.Sprite", is that not a major change to the flow of the code and the way classes and variables have been initialized?
+in fact the pygame and pygame.sprite module is a new introduction of code in this program which has been mainly built on turtle.
+
+Prompt 7
+Yes there is a function in the ammomanager.py called "check_hits(self, aliens)" use this logic to check a hit on the spaceship, when a bullet from the spaceship hits an alien the alien(turtle) is hidden and removed from the list of aliens and a swooshing sound is played on impact. Now, when the spaceship is hit from an alien bullet I want the swooshing sound to play and instead of the spaceship disappearing I want the health gauge to decrease per hit on the spaceship
+
+Prompt 8
+Yes write out the exact file patches (Ammomanager.py + Spaceship.py + Aliens.py edits) in your repo’s structure so you can just copy–paste them in
+
+Prompt 9
+It seems you cannot read my code from the github repo thoroughly. Below is the current code for "ammomanager.py" based on this look at the repo again and give me each .py individually and exactly which lines I need to update. a full code update and not suggestions
+
+from ammunition import Ammunition
+from turtle import Turtle
+import pygame
+import os
+
+# Initialize mixer if not already
+pygame.mixer.init()
+
+# Get path relative to this file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sound_path = os.path.join(BASE_DIR, "sounds/swoosh.ogg")  # or swoosh.ogg
+
+# Load swoosh sound once
+swoosh_sound = pygame.mixer.Sound(sound_path)
+
+
+class AmmoManager:
+    def __init__(self, scoreboard):
+        self.bullets = []
+        self.scoreboard = scoreboard
+
+    def fire(self, x, y):
+        bullet = Ammunition(x, y)
+        self.bullets.append(bullet)
+
+    def update_bullets(self):
+        for bullet in self.bullets[:]:
+            if bullet.isvisible():
+                bullet.move_bullet()
+            else:
+                self.bullets.remove(bullet)
+
+    def check_hits(self, aliens):
+        # points = 0
+        for bullet in self.bullets[:]:
+            for alien in aliens[:]:
+                if bullet.distance(alien) < 45:
+                    swoosh_sound.play()
+                    bullet.hideturtle()
+                    alien.hideturtle()
+                    self.bullets.remove(bullet)
+                    if alien.shape() == "src/alien1.gif":
+                        points = 10
+                    elif alien.shape() == "src/alien2.gif":
+                        points = 20
+                    elif alien.shape() == "src/alien3.gif":
+                        points = 30
+                    elif alien.shape() == "src/alien4.gif":
+                        points = 40
+                    elif alien.shape() == "src/alien5.gif":
+                        points = 50
+                    elif alien.shape() == "src/alien6.gif":
+                        points = 60
+                    elif alien.shape() == "src/alien7.gif":
+                        points = 70
+                    else:
+                        points = 0
+
+                    aliens.remove(alien)
+                    self.scoreboard.update_score(points=points)
+                    break  # Exit inner loop to avoid modifying list during iteration
+
+Prompt 10
+I see you are held back by constraints to read/access the GitHub repo. The code changes you have suggested are too drastic and will break the current working code. I will paste the current code so you can give better upgrades.
+
+main.py
+from turtle import Screen
+from spaceship import Spaceship
+from scoreboard import ScoreBoard
+from aliens import Alien
+from ammomanager import AmmoManager
+import time
+
+screen = Screen()
+screen.setup(width=600, height=600)
+screen.cv._rootwindow.resizable(False, False)
+screen.tracer(0)
+screen.bgpic("src/Galaxy.gif")
+
+screen.addshape("src/spaceship.gif")
+screen.addshape("src/bullet.gif")
+alien_gifs = ["src/alien1.gif", "src/alien2.gif", "src/alien3.gif", "src/alien4.gif", "src/alien5.gif", "src/alien6.gif"]
+for gif in alien_gifs:
+    screen.addshape(gif)
+
+spaceship = Spaceship()
+scoreboard = ScoreBoard()
+alien_list = [Alien() for _ in range(30)]
+ammo = AmmoManager(scoreboard)
+
+
+def fire_bullet():
+    x, y = spaceship.position()
+    ammo.fire(x, y)
+
+
+screen.listen()
+screen.onkey(spaceship.move_forward, "Up")
+screen.onkey(spaceship.move_back, "Down")
+screen.onkey(spaceship.left_shift, "Left")
+screen.onkey(spaceship.right_shift, "Right")
+screen.onkey(fire_bullet, "space")
+
+game_is_on = True
+while game_is_on:
+    time.sleep(scoreboard.level_speed)
+    screen.update()
+
+    for alien in alien_list:
+        alien.move()
+        if alien.distance(spaceship) < 30:
+            scoreboard.game_over()
+            game_is_on = False
+
+    if spaceship.ycor() > 280:
+        scoreboard.update_score()
+        spaceship.reset_player()
+
+    ammo.update_bullets()
+    ammo.check_hits(alien_list)
+
+screen.exitonclick()
+
+aliens.py
+from turtle import Turtle
+import random
+alien_color = ["blue", "red", "purple", "yellow", "orange", "green", "brown", "pink"]
+alien_shapes = ["src/alien1.gif", "src/alien2.gif", "src/alien3.gif", "src/alien4.gif", "src/alien5.gif", "src/alien6.gif"]
+
+class Alien(Turtle):
+    def __init__(self):
+        super().__init__()
+        self.penup()
+        self.shape(random.choice(alien_shapes))
+        self.penup()
+        self.setheading(270)
+        self.goto(random.randint(-280, 280), random.randint(250, 700))
+
+    def move(self):
+        self.forward(random.randint(0, 5))
+
+aliens.py
+from turtle import Turtle
+import random
+alien_color = ["blue", "red", "purple", "yellow", "orange", "green", "brown", "pink"]
+alien_shapes = ["src/alien1.gif", "src/alien2.gif", "src/alien3.gif", "src/alien4.gif", "src/alien5.gif", "src/alien6.gif"]
+
+class Alien(Turtle):
+    def __init__(self):
+        super().__init__()
+        self.penup()
+        self.shape(random.choice(alien_shapes))
+        self.penup()
+        self.setheading(270)
+        self.goto(random.randint(-280, 280), random.randint(250, 700))
+
+    def move(self):
+        self.forward(random.randint(0, 5))
+
+ammomanager.py
+from ammunition import Ammunition
+from turtle import Turtle
+import pygame
+import os
+
+# Initialize mixer if not already
+pygame.mixer.init()
+
+# Get path relative to this file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sound_path = os.path.join(BASE_DIR, "sounds/swoosh.ogg")  # or swoosh.ogg
+
+# Load swoosh sound once
+swoosh_sound = pygame.mixer.Sound(sound_path)
+
+
+class AmmoManager:
+    def __init__(self, scoreboard):
+        self.bullets = []
+        self.scoreboard = scoreboard
+
+    def fire(self, x, y):
+        bullet = Ammunition(x, y)
+        self.bullets.append(bullet)
+
+    def update_bullets(self):
+        for bullet in self.bullets[:]:
+            if bullet.isvisible():
+                bullet.move_bullet()
+            else:
+                self.bullets.remove(bullet)
+
+    def check_hits(self, aliens):
+        # points = 0
+        for bullet in self.bullets[:]:
+            for alien in aliens[:]:
+                if bullet.distance(alien) < 45:
+                    swoosh_sound.play()
+                    bullet.hideturtle()
+                    alien.hideturtle()
+                    self.bullets.remove(bullet)
+                    if alien.shape() == "src/alien1.gif":
+                        points = 10
+                    elif alien.shape() == "src/alien2.gif":
+                        points = 20
+                    elif alien.shape() == "src/alien3.gif":
+                        points = 30
+                    elif alien.shape() == "src/alien4.gif":
+                        points = 40
+                    elif alien.shape() == "src/alien5.gif":
+                        points = 50
+                    elif alien.shape() == "src/alien6.gif":
+                        points = 60
+                    elif alien.shape() == "src/alien7.gif":
+                        points = 70
+                    else:
+                        points = 0
+
+                    aliens.remove(alien)
+                    self.scoreboard.update_score(points=points)
+                    break  # Exit inner loop to avoid modifying list during iteration
+ 
+ammunition.py
+from turtle import Turtle
+
+
+class Ammunition(Turtle):
+    def __init__(self, x, y):
+        super().__init__()
+        # self.color("white")
+        self.shape("src/bullet.gif")
+        self.penup()
+        self.goto(x, y)
+        self.y_move = 17
+        self.move_bullet()
+
+    def move_bullet(self):
+        new_y = self.ycor() + self.y_move
+        self.goto(self.xcor(), new_y)
+        # Keep moving every 50 milliseconds
+        if self.ycor() < 300:  # Stop bullet when it leaves the screen
+            self.getscreen().ontimer(self.move_bullet, 50)
+        else:
+            self.hideturtle()
+            self.clear()
+
+scoreboard.py
+from turtle import Turtle
+
+
+class ScoreBoard(Turtle):
+    def __init__(self):
+        super().__init__()
+        self.color("white")
+        self.penup()
+        self.hideturtle()
+        self.goto(0, 260)
+        self.score = 0
+        self.level_speed = 0.1
+        self.write(f"Score: {self.score}", align="center", font=("Arial", 20, "normal"))
+
+    def update_score(self, points):
+        self.clear()
+        self.score += points
+        self.write(f"Score: {self.score}", align="center", font=("Arial", 20, "normal"))
+        # self.level_speed *= 0.5
+
+    def game_over(self):
+        self.goto(0, 0)
+        self.write("GAME OVER", align="center", font=("Arial", 20, "normal"))
+
+ 
+
+
+ spaceship.py
+from turtle import Turtle
+
+class Spaceship(Turtle):
+    def __init__(self):
+        super().__init__()
+        self.penup()
+        self.shape("src/spaceship.gif")
+        self.setheading(90)
+        self.goto(0, -260)
+
+    def move_forward(self):
+        self.forward(15)
+
+    def move_back(self):
+        self.forward(-15)
+
+    def right_shift(self):
+        if self.xcor() > 280:
+            pass
+        else:
+            self.goto(self.xcor() + 20, self.ycor())
+
+    def left_shift(self):
+        if self.xcor() < -280:
+            pass
+        else:
+            self.goto(self.xcor() - 20, self.ycor())
+
+    def reset_player(self):
+        self.goto(0, -280)
