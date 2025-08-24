@@ -7,20 +7,21 @@ import time
 
 screen = Screen()
 screen.setup(width=600, height=600)
-screen.cv._rootwindow.resizable(False,False)
+screen.cv._rootwindow.resizable(False, False)
 screen.tracer(0)
 screen.bgpic("src/Galaxy.gif")
 
 screen.addshape("src/spaceship.gif")
 screen.addshape("src/bullet.gif")
-alien_gifs = ["src/alien1.gif", "src/alien2.gif", "src/alien3.gif", "src/alien4.gif", "src/alien5.gif", "src/alien6.gif"]
+alien_gifs = ["src/alien1.gif", "src/alien2.gif", "src/alien3.gif",
+              "src/alien4.gif", "src/alien5.gif", "src/alien6.gif"]
 for gif in alien_gifs:
     screen.addshape(gif)
 
 spaceship = Spaceship()
 scoreboard = ScoreBoard()
 alien_list = [Alien() for _ in range(30)]
-ammo = AmmoManager(scoreboard)
+ammo = AmmoManager(scoreboard, spaceship)
 
 
 def fire_bullet():
@@ -42,15 +43,16 @@ while game_is_on:
 
     for alien in alien_list:
         alien.move()
-        if alien.distance(spaceship) < 30:
-            scoreboard.game_over()
-            game_is_on = False
+        alien.maybe_fire(ammo.alien_bullets)
 
     if spaceship.ycor() > 280:
-        scoreboard.update_score()
+        scoreboard.update_score(0)
         spaceship.reset_player()
 
     ammo.update_bullets()
     ammo.check_hits(alien_list)
+
+    if spaceship.health <= 0:
+        game_is_on = False
 
 screen.exitonclick()
