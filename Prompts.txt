@@ -336,3 +336,29 @@ class Spaceship(Turtle):
 
     def reset_player(self):
         self.goto(0, -280)
+
+
+Prompt 11
+You have removed the part when the alien touches the spaceship it becomes immediately "game over"
+        if alien.distance(spaceship) < 30:
+            scoreboard.game_over()
+            game_is_on = False
+Also draw a health bar (like a gauge at top left) in scoreboard.py, so health is visible during play, instead of just tracking internally
+
+Prompt 12
+The game behaviour is not as I requested. All the features of the program are working correctly, Why are the aliens not firing bullets anymore. why did you break that part of the program from working
+
+Prompt 13
+Yes provide a fully fixed set of main.py, ammomanager.py, and spaceship.py that:
+
+keeps all existing features intact,
+
+re-enables alien bullets firing,
+
+decreases spaceship health on hit,
+
+draws health bar,
+
+keeps instant game over if an alien touches the spaceship.
+
+
