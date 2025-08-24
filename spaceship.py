@@ -7,7 +7,7 @@ class Spaceship(Turtle):
         self.shape("src/spaceship.gif")
         self.setheading(90)
         self.goto(0, -260)
-        self.health = 3   # <-- NEW: spaceship starts with 3 health
+        self.health = 100  # start with 100%
 
     def move_forward(self):
         self.forward(15)
@@ -26,9 +26,9 @@ class Spaceship(Turtle):
     def reset_player(self):
         self.goto(0, -280)
 
-    def take_damage(self):
+    def take_damage(self, amount):
         """Reduce health by 1 when hit by alien bullet"""
-        self.health -= 1
-        if self.health <= 0:
-            return True  # spaceship destroyed
-        return False
+        self.health -= amount
+        if self.health < 0:
+            self.health = 0
+        return self.health == 0

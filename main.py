@@ -19,7 +19,7 @@ for gif in alien_gifs:
     screen.addshape(gif)
 
 spaceship = Spaceship()
-scoreboard = ScoreBoard()
+scoreboard = ScoreBoard(spaceship)
 alien_list = [Alien() for _ in range(30)]
 ammo = AmmoManager(scoreboard, spaceship)
 
@@ -41,18 +41,28 @@ while game_is_on:
     time.sleep(scoreboard.level_speed)
     screen.update()
 
+    # move aliens and check for collision with spaceship
     for alien in alien_list:
         alien.move()
-        alien.maybe_fire(ammo.alien_bullets)
+        if alien.distance(spaceship) < 30:
+            scoreboard.game_over()
+            game_is_on = False
 
+    # spaceship reaches top
     if spaceship.ycor() > 280:
         scoreboard.update_score(0)
         spaceship.reset_player()
 
+    # move bullets and check hits
     ammo.update_bullets()
     ammo.check_hits(alien_list)
 
+    # update health bar
+    scoreboard.update_health_bar()
+
+    # game over if spaceship health 0
     if spaceship.health <= 0:
+        scoreboard.game_over()
         game_is_on = False
 
 screen.exitonclick()
