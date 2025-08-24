@@ -3,6 +3,7 @@ from spaceship import Spaceship
 from scoreboard import ScoreBoard
 from aliens import Alien
 from ammomanager import AmmoManager
+import random
 import time
 
 screen = Screen()
@@ -41,26 +42,24 @@ while game_is_on:
     time.sleep(scoreboard.level_speed)
     screen.update()
 
-    # move aliens and check for collision with spaceship
+    # Move aliens and randomly fire bullets
     for alien in alien_list:
         alien.move()
-        if alien.distance(spaceship) < 30:
+        if alien.distance(spaceship) < 30:  # instant game over
             scoreboard.game_over()
             game_is_on = False
+        if random.randint(1, 150) == 1:    # ~1/150 chance per tick
+            ammo.alien_fire(alien.xcor(), alien.ycor())
 
-    # spaceship reaches top
+    # Spaceship reaches top
     if spaceship.ycor() > 280:
         scoreboard.update_score(0)
         spaceship.reset_player()
 
-    # move bullets and check hits
     ammo.update_bullets()
     ammo.check_hits(alien_list)
-
-    # update health bar
     scoreboard.update_health_bar()
 
-    # game over if spaceship health 0
     if spaceship.health <= 0:
         scoreboard.game_over()
         game_is_on = False
