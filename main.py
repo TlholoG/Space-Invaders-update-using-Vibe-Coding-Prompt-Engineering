@@ -2,7 +2,7 @@ import time
 import random
 from turtle import Screen
 from spaceship import Spaceship
-from scoreboard import ScoreBoard
+from scoreboard import Scoreboard
 from ammomanager import AmmoManager
 from aliens import Alien
 
@@ -20,7 +20,7 @@ for i in range(1, 8):
 
 # Initialize main game objects
 spaceship = Spaceship()
-scoreboard = ScoreBoard()
+scoreboard = Scoreboard(spaceship)  # ✅ pass spaceship into Scoreboard
 ammo = AmmoManager(scoreboard)
 
 # Aliens setup
@@ -39,6 +39,7 @@ screen.listen()
 screen.onkey(spaceship.go_left, "Left")
 screen.onkey(spaceship.go_right, "Right")
 screen.onkey(lambda: ammo.fire(spaceship.xcor(), spaceship.ycor()), "space")
+
 
 # ----------------- Game Loop -----------------
 def game_loop():
@@ -77,6 +78,7 @@ def game_loop():
     # Refresh screen + schedule next frame
     screen.update()
     screen.ontimer(game_loop, 30)  # 30ms ≈ 33 FPS
+
 
 # ----------------- Start Game -----------------
 screen.update()
