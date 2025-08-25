@@ -361,4 +361,82 @@ draws health bar,
 
 keeps instant game over if an alien touches the spaceship.
 
+Prompt 14
+The program is now significantly slower, tends to freeze and lag. I think this is because the program relies on too loops. how should I restructure this code to run faster
+
+Prompt 15
+rewrite the full main.py with this timer-based loop while keeping everything else unchanged, so it can drop it in directly
+
+Prompt 16
+yes, patch ammomanager.py slightly so that check_hits() explicitly accepts spaceship as an argument (since it had to update that call in main.py)
+fix this error the Scoreboard constructor must receive a spaceship.
+scoreboard = Scoreboard()
+                 ^^^^^^^^^^^^
+TypeError: Scoreboard.__init__() missing 1 required positional argument: 'spaceship'
+
+Prompt 17
+line 34, in <module>
+    alien = Alien(x, y, f"src/alien{alien_type}.gif")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Alien.__init__() takes 1 positional argument but 4 were given
+
+Prompt 18
+In my starting code I allow the alien to spawn at a random location in the x, y plane using this line in the Alien class:
+ self.goto(random.randint(-280, 280), random.randint(250, 700))
+
+what justifies you changing the definition of the class to the code snippet below
+class Alien(Turtle):
+    def __init__(self, x, y, shape_path):
+        super().__init__()
+       
+        self.goto(x, y)
+
+which creates these extra lines of code in the main.py
+
+# Aliens setup
+alien_list = []
+x_positions = [-350, -250, -150, -50, 50, 150, 250, 350]
+y_positions = [200, 150, 100, 50]
+
+Prompt 19
+line 58, in game_loop
+    ammo.alien_fire(alien.xcor(), alien.ycor())
+line 28, in alien_fire
+    bullet = Ammunition(x, y)
+             ^^^^^^^^^^^^^^^^
+line 8, in __init__
+    self.shape("src/bullet.gif")
+line 2832, in shape
+    raise TurtleGraphicsError("There is no shape named %s" % name)
+turtle.TurtleGraphicsError: There is no shape named src/bullet.gif
+
+Prompt 20
+you have broken the code and program is now filled with errors.
+with the previous errors in mind this is what the ammunition class looks like. Please let it flow.
+class Ammunition(Turtle):
+    def __init__(self, x, y):
+        super().__init__()
+        # self.color("white")
+        self.shape("src/bullet.gif")
+        self.penup()
+        self.goto(x, y)
+        self.y_move = 17
+        self.move_bullet()
+
+    def move_bullet(self):
+        new_y = self.ycor() + self.y_move
+        self.goto(self.xcor(), new_y)
+        # Keep moving every 50 milliseconds
+        if self.ycor() < 300:  # Stop bullet when it leaves the screen
+            self.getscreen().ontimer(self.move_bullet, 50)
+        else:
+            self.hideturtle()
+            self.clear()
+
+*****[I closed all chat and PyCharm windows, need to approach with a fresher mind]*****
+
+Prompt 21
+Too many changes have been made and I cannot recognize my original code. We must revert to the code that previously worked according to my constraints. Seeing as you cannot get access to my GitHub I will paste the code from the relevant files that have been modified. We will Start the new session from here.
+
+
 
