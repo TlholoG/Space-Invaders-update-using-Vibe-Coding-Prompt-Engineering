@@ -1,67 +1,84 @@
+import time
+import random
 from turtle import Screen
 from spaceship import Spaceship
 from scoreboard import ScoreBoard
-from aliens import Alien
 from ammomanager import AmmoManager
-import random
-import time
+from aliens import Alien
 
+# ----------------- Setup -----------------
 screen = Screen()
-screen.setup(width=600, height=600)
-screen.cv._rootwindow.resizable(False, False)
-screen.tracer(0)
-screen.bgpic("src/Galaxy.gif")
+screen.setup(width=800, height=600)
+screen.bgcolor("black")
+screen.title("Space Invaders Turtle Edition")
+screen.tracer(0)  # Turn off automatic updates
 
-screen.addshape("src/spaceship.gif")
-screen.addshape("src/bullet.gif")
-alien_gifs = ["src/alien1.gif", "src/alien2.gif", "src/alien3.gif",
-              "src/alien4.gif", "src/alien5.gif", "src/alien6.gif"]
-for gif in alien_gifs:
-    screen.addshape(gif)
+# Register shapes for spaceship + aliens
+screen.register_shape("src/spaceship.gif")
+for i in range(1, 8):
+    screen.register_shape(f"src/alien{i}.gif")
 
+# Initialize main game objects
 spaceship = Spaceship()
-scoreboard = ScoreBoard(spaceship)
-alien_list = [Alien() for _ in range(30)]
-ammo = AmmoManager(scoreboard, spaceship)
+scoreboard = ScoreBoard()
+ammo = AmmoManager(scoreboard)
 
+# Aliens setup
+alien_list = []
+x_positions = [-350, -250, -150, -50, 50, 150, 250, 350]
+y_positions = [200, 150, 100, 50]
 
-def fire_bullet():
-    x, y = spaceship.position()
-    ammo.fire(x, y)
+for y in y_positions:
+    for i, x in enumerate(x_positions):
+        alien_type = (i % 7) + 1
+        alien = Alien(x, y, f"src/alien{alien_type}.gif")
+        alien_list.append(alien)
 
-
+# ----------------- Controls -----------------
 screen.listen()
-screen.onkey(spaceship.move_forward, "Up")
-screen.onkey(spaceship.move_back, "Down")
-screen.onkey(spaceship.left_shift, "Left")
-screen.onkey(spaceship.right_shift, "Right")
-screen.onkey(fire_bullet, "space")
+screen.onkey(spaceship.go_left, "Left")
+screen.onkey(spaceship.go_right, "Right")
+screen.onkey(lambda: ammo.fire(spaceship.xcor(), spaceship.ycor()), "space")
 
-game_is_on = True
-while game_is_on:
-    time.sleep(scoreboard.level_speed)
-    screen.update()
-
-    # Move aliens and randomly fire bullets
-    for alien in alien_list:
+# ----------------- Game Loop -----------------
+def game_loop():
+    """Runs one frame of the game and reschedules itself."""
+    # Move aliens + random alien firing
+    for alien in alien_list[:]:
         alien.move()
-        if alien.distance(spaceship) < 30:  # instant game over
+
+        # If alien collides with spaceship → instant game over
+        if alien.distance(spaceship) < 30:
             scoreboard.game_over()
-            game_is_on = False
-        if random.randint(1, 150) == 1:    # ~1/150 chance per tick
+            return  # stop scheduling new frames
+
+        # Alien random firing
+        if random.randint(1, 150) == 1:
             ammo.alien_fire(alien.xcor(), alien.ycor())
 
-    # Spaceship reaches top
+    # Prevent spaceship from leaving top boundary
     if spaceship.ycor() > 280:
-        scoreboard.update_score(0)
         spaceship.reset_player()
 
+    # Update bullets (both spaceship + aliens)
     ammo.update_bullets()
-    ammo.check_hits(alien_list)
+
+    # Check bullet hits (on aliens + spaceship)
+    ammo.check_hits(alien_list, spaceship)
+
+    # Update health bar
     scoreboard.update_health_bar()
 
+    # If spaceship health reaches 0 → game over
     if spaceship.health <= 0:
         scoreboard.game_over()
-        game_is_on = False
+        return
 
-screen.exitonclick()
+    # Refresh screen + schedule next frame
+    screen.update()
+    screen.ontimer(game_loop, 30)  # 30ms ≈ 33 FPS
+
+# ----------------- Start Game -----------------
+screen.update()
+game_loop()
+screen.mainloop()
